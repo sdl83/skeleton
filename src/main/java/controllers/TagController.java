@@ -1,13 +1,20 @@
 package controllers;
 
-//import api.CreateTagRequest;
+import api.ReceiptResponse;
 import dao.TagDao;
+import generated.tables.records.ReceiptsRecord;
+import generated.tables.records.TagsRecord;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
+@Path("")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class TagController {
@@ -18,25 +25,30 @@ public class TagController {
         this.tags = tags;
     }
 
-    // TODO: add methods for GET and PUT
+    // TODO: add methods for GET
+
 
     // add a tag to a receipt
-//    @PUT
-//    @Path("/tags/{tag}")
-//    public int toggleTag(@PathParam("tag") String tagName, @Valid @NotNull CreateTagRequest tag) {
-//        return 99;
-//        // <your code here
-//    }
+    @PUT
+    @Path("/tags/{tag}")
+    public void toggleTag(@PathParam("tag") String tagName, int receiptID) {
+
+        if (tags.check(tagName, receiptID)) {
+            tags.delete(tagName, receiptID);
+        } else {
+            tags.insert(tagName, receiptID);
+        }
+
+    }
 
 
-//    @POST
-//    public int createReceipt(@Valid @NotNull CreateReceiptRequest receipt) {
-//        return receipts.insert(receipt.merchant, receipt.amount);
-//    }
-//
-//    public List<ReceiptResponse> getReceipts() {
-//        List<ReceiptsRecord> receiptRecords = receipts.getAllReceipts();
-//        return receiptRecords.stream().map(ReceiptResponse::new).collect(toList());
-//    }
+    @GET
+    @Path("/tags/{tag}")
+    public List<ReceiptResponse> getTags (@PathParam("tag") String tagName) {
+        List<Integer> tagRecords = tags.getTagReceiptsIDs(tagName);
+        List<ReceiptsRecord> receipts = tags.getAllReceiptsbyIDs(tagRecords);
+
+        return receipts.stream().map(ReceiptResponse::new).collect(toList());
+    }
 
 }
