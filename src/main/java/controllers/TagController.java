@@ -25,8 +25,6 @@ public class TagController {
         this.tags = tags;
     }
 
-    // TODO: add methods for GET
-
 
     // add a tag to a receipt
     @PUT
