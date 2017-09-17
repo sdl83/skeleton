@@ -49,4 +49,15 @@ public class TagController {
         return receipts.stream().map(ReceiptResponse::new).collect(toList());
     }
 
+    @GET
+    @Path("/netid")
+    public String getNetID() {
+        return "sdl83";
+    }
+
+    @GET
+    public String getNetID2() {
+        return "sdl83";
+    }
+
 }
