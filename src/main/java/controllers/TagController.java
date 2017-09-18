@@ -39,7 +39,6 @@ public class TagController {
 
     }
 
-
     @GET
     @Path("/tags/{tag}")
     public List<ReceiptResponse> getTags (@PathParam("tag") String tagName) {
