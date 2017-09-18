@@ -41,8 +41,8 @@
                     $(`<tr class="receipt">`
                             + `<td class="time">${receipt.created}</td>`
                             + `<td class="merchant">${receipt.merchant}</td>`
-                            + `<th class="amount">${receipt.amount}</th>`
-                            <!--<div class="tags">${receipt.tags}</div>-->
+                            + `<td class="amount">${receipt.amount}</td>`
+                            + `<td class="tags">${receipt.tags}</td>`
                         + `</tr>`)
                         .appendTo($("#receiptList"));
                 }
@@ -60,7 +60,7 @@
             <th>Time</th>
             <th>Merchant</th>
             <th>$</th>
-            <!--<th></th>-->
+            <th>Tags</th>
         </tr>
     </table>
 </DIV>

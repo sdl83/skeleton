@@ -8,9 +8,11 @@ import org.jooq.impl.DSL;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.ArrayList;
 
 import static com.google.common.base.Preconditions.checkState;
 import static generated.Tables.RECEIPTS;
+import static generated.Tables.TAGS;
 
 public class ReceiptDao {
     DSLContext dsl;
@@ -29,6 +31,15 @@ public class ReceiptDao {
         checkState(receiptsRecord != null && receiptsRecord.getId() != null, "Insert failed");
 
         return receiptsRecord.getId();
+    }
+
+    public ArrayList<String> getReceiptTags(Integer receipt) {
+        return new ArrayList<String>(dsl
+                .select()
+                .from(TAGS)
+                .where(TAGS.RECEIPTID.eq(receipt))
+                .fetch()
+                .getValues(TAGS.TAGNAME));
     }
 
     public List<ReceiptsRecord> getAllReceipts() {

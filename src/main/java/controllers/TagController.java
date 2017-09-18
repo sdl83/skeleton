@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.ArrayList;
 
 import static java.util.stream.Collectors.toList;
 
@@ -44,7 +45,6 @@ public class TagController {
     public List<ReceiptResponse> getTags (@PathParam("tag") String tagName) {
         List<Integer> tagRecords = tags.getTagReceiptsIDs(tagName);
         List<ReceiptsRecord> receipts = tags.getAllReceiptsbyIDs(tagRecords);
-
         return receipts.stream().map(ReceiptResponse::new).collect(toList());
     }
 

@@ -5,6 +5,7 @@ import generated.tables.records.ReceiptsRecord;
 
 import java.math.BigDecimal;
 import java.sql.Time;
+import java.util.ArrayList;
 
 /**
  * This is an API Object.  Its purpose is to model the JSON API that we expose.
@@ -28,11 +29,24 @@ public class ReceiptResponse {
     @JsonProperty
     Time created;
 
+    @JsonProperty
+    ArrayList<String> tags;
+
     public ReceiptResponse(ReceiptsRecord dbRecord) {
         this.merchant = dbRecord.getMerchant();
         this.amount = dbRecord.getAmount();
         this.created = dbRecord.getUploaded();
         this.id = dbRecord.getId();
-//        this.tags = new Arr;
+        this.tags = new ArrayList<String>();
     }
+
+    public Integer getID() {
+        return id;
+    }
+
+    public void setTags (ArrayList<String> tags) {
+        this.tags = tags;
+    }
+
+
 }
