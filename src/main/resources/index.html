@@ -177,6 +177,9 @@
                     $(newTag).appendTo($("#"+ receiptID.toString() + "-TagsList"));
                 })
             }
+        }
+
+        function addButton(receiptID) {
             var newAdd = document.createElement("button");
             newAdd.setAttribute("class", "add-tag");
             newAdd.innerHTML = "Add";
@@ -210,7 +213,7 @@
                 contentType: "application/json",
                 dataType: "json",
                 success: function () {
-                    getReceipts();
+                    getReceipt(receiptID);
                 },
                 error: function (){
                     alert("The tag you attempted to remove or add could not be removed/added. Please try again. ");
@@ -239,13 +242,39 @@
                         + `</tr>`)
                         .appendTo($("#receiptList"));
                     addTags(tags, receipt.id);
+                    addButton(receipt.id);
                 }
             });
         }
 
+        function getReceipt(receiptID) {
+
+            $.getJSON("/receipts", function(receipts){
+                    var receipt = receipts[receiptID - 1];
+                    var tags = receipt.tags;
+                    if ($('.receipt')[receiptID - 1] == null) {
+                        $(`<tr class="receipt" style="height: 100px"->`
+                            + `<td class="time">${receipt.created}</td>`
+                            + `<td class="merchant">${receipt.merchant}</td>`
+                            + `<td class="amount">${receipt.amount}</td>`
+                            + `<td class="tags" id=${receipt.id.toString() + "-Tags"}>`
+                            + `<div id=${receipt.id.toString() + "-TagsList"}></div>`
+                            + `</td>`
+                            + `</tr>`)
+                            .appendTo($("#receiptList"));
+                        addTags(tags, receipt.id);
+                        addButton(receipt.id);
+                    } else {
+                        document.getElementById(receiptID.toString() + "-TagsList").innerHTML = "";
+                        addTags(tags, receipt.id);
+                    }
+            });
+        }
+
+
         $(function(){
             getReceipts();
-        });
+        })
 
         function showForm() {
 //            show form on add click
@@ -255,7 +284,7 @@
                 $("#receipt-entry").show();
             }
             return false;
-        };
+        }
 
         function hideForm() {
 //            hide form and clear values on cancel
@@ -263,7 +292,7 @@
             $("#merchant").val("");
             $("#amount").val("");
             return false;
-        };
+        }
 
         function saveReceipt() {
 //            get entered inputs
@@ -276,9 +305,8 @@
                 data: JSON.stringify({"merchant": merchant, "amount": amount}),
                 contentType: "application/json",
                 dataType: "json",
-                success: function () {
-
-                    getReceipts();
+                success: function (id) {
+                    getReceipt(id);
                 },
                 error: function (){
                     alert("Your receipt entry was not properly processed. Please resubmit your receipt information.");
