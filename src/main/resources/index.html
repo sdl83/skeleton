@@ -9,6 +9,10 @@
     <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
     <style>
 
+        body {
+            padding-bottom: 60px;
+        }
+
         h1 {
             font-family: 'Indie Flower', cursive;
             font-size: 50px;
@@ -29,8 +33,9 @@
         h2 {
             float: left;
             font-family: 'Raleway', sans-serif;
-            margin-left: 20px;
+            margin-left: 10%;
             font-size: 30px;
+            margin-bottom: 40px;
         }
 
         .button {
@@ -44,7 +49,7 @@
             text-align: center;
             border-radius: 10px;
             margin-top: 20px;
-            margin-right: 10px;
+            margin-right: 10%;
             cursor: pointer;
         }
 
@@ -95,7 +100,7 @@
         }
 
         #receiptList {
-            margin-top: 40px;
+            /*margin-top: 60px !important;*/
             font-family: 'Raleway', sans-serif;
             /*border: 1px solid green;*/
             clear: both;
@@ -116,10 +121,6 @@
 
         .receipt {
             font-size: 18px;
-            /*min-height: 80px;*/
-            /*background-color: #eee;*/
-            /*margin-bottom: 100px !important;*/
-            /*margin-top: 40px !important;*/
         }
 
         .receipt button {
@@ -146,7 +147,6 @@
             border-radius: 5px;
             border-color: grey;
         }
-
 
 
         .tagValue {
@@ -284,6 +284,8 @@
                     alert("Your receipt entry was not properly processed. Please resubmit your receipt information.");
                 }
             });
+
+            hideForm();
 
             return false;
         }
