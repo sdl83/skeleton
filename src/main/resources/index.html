@@ -2,10 +2,13 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="style.css" />
+    <!--<link rel="stylesheet" href="style.css" />-->
+    <title>My Lil' Receipt Logger</title>
     <script data-require="jquery@*" data-semver="3.1.1" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <style>
+
         #container {border: 1px solid brown;}
+
         H1 {float: left;}
 
         .button{
@@ -28,40 +31,91 @@
             margin-bottom: 5px;
         }
 
+        #receipt-entry {
+            display: none;
+            clear: both;
+            width: 100%;
+        }
+
     </style>
     <script>
         // This is the idiomatic way to ensure that JQuery does not
         // execute until the page has loaded
-        $(function(){
+        function getReceipts() {
             const api = ""; // <- do not need a root api URL if this page is served directly by the API
-
+            var table = "<tr><th>Time</th><th>Merchant</th><th>$</th><th>Tags</th></tr>";
+            $("#receiptList").html(table);
             $.getJSON(api+"/receipts", function(receipts){
                 for(var i=0; i < receipts.length; i++) {
                     var receipt = receipts[i];
                     $(`<tr class="receipt">`
-                            + `<td class="time">${receipt.created}</td>`
-                            + `<td class="merchant">${receipt.merchant}</td>`
-                            + `<td class="amount">${receipt.amount}</td>`
-                            + `<td class="tags">${receipt.tags}</td>`
+                        + `<td class="time">${receipt.created}</td>`
+                        + `<td class="merchant">${receipt.merchant}</td>`
+                        + `<td class="amount">${receipt.amount}</td>`
+                        + `<td class="tags">${receipt.tags}</td>`
                         + `</tr>`)
                         .appendTo($("#receiptList"));
                 }
-            })
-        })
+            });
+        }
+
+        $(function(){
+            getReceipts();
+        });
+
+        function showForm() {
+//            show form on add click
+            $("#receipt-entry").show();
+            return false;
+        };
+
+        function hideForm() {
+//            hide form and clear values on cancel
+            $("#receipt-entry").hide();
+            $("#merchant").val("");
+            $("#amount").val("");
+            return false;
+        };
+
+        function saveReceipt() {
+//            get entered inputs
+            var merchant = $("#merchant").val();;
+            var amount = $("#amount").val();
+
+            $.ajax({
+                url: "/receipts",
+                type: "POST",
+                data: JSON.stringify({"merchant": merchant, "amount": amount}),
+                contentType: "application/json",
+                dataType: "json",
+                success: function () {
+                    getReceipts();
+                },
+                error: function (){
+                    alert("Your receipt entry was not properly processed. Please resubmit your receipt information.");
+                }
+            });
+
+            return false;
+        }
+
+
+
+
     </script>
 </head>
 
 <body>
 <DIV id="container">
     <h1>My receipts</h1>
-    <div class="button">+</div>
+    <div class="button" id="add-receipt" onclick="return showForm()">+</div>
+    <form id="receipt-entry">
+        <input type="text" id="merchant" placeholder="merchant"><br>
+        <input type="text" id=amount placeholder="amount"><br>
+        <button id="cancel-receipt" onclick="return hideForm()">Cancel</button>
+        <button id="save-receipt" onclick="return saveReceipt()">Save</button>
+    </form>
     <table style="width:100%" id="receiptList">
-        <tr>
-            <th>Time</th>
-            <th>Merchant</th>
-            <th>$</th>
-            <th>Tags</th>
-        </tr>
     </table>
 </DIV>
 </body>

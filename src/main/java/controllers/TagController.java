@@ -54,9 +54,4 @@ public class TagController {
         return "sdl83";
     }
 
-    @GET
-    public String getNetID2() {
-        return "sdl83";
-    }
-
 }
