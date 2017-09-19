@@ -37,10 +37,77 @@
             width: 100%;
         }
 
+        .tagValue {
+            display: inline-block;
+            background-color: aqua;
+            border-radius: 5px;
+            padding: 5px;
+            margin: 5px;
+            text-align: center;
+            vertical-align:middle;
+            cursor: pointer;
+        }
+
     </style>
     <script>
         // This is the idiomatic way to ensure that JQuery does not
         // execute until the page has loaded
+
+        function addTags(tags, receiptID) {
+            if (tags!= null && tags.length >= 1) {
+                tags.forEach(function(tag) {
+                    var newTag = document.createElement("div");
+                    newTag.setAttribute("class", "tagValue");
+                    newTag.onclick = function() {
+                        putTag(receiptID, tag);
+                    };
+                    newTag.innerHTML = tag;
+                    $(newTag).appendTo($("#"+ receiptID.toString() + "-TagsList"));
+                })
+            }
+            var newAdd = document.createElement("button");
+            newAdd.setAttribute("class", "add-tag");
+            newAdd.innerHTML = "Add";
+            $(newAdd).appendTo($("#"+ receiptID.toString() + "-Tags"));
+            newAdd.onclick = function () {
+                if (document.getElementById(receiptID.toString() + "_tag_input") == null) {
+                    var newInput = document.createElement("input");
+                    newInput.setAttribute("id", receiptID.toString() + "_tag_input");
+                    newInput.setAttribute("class", "tag_input");
+                    newInput.setAttribute("type", "text");
+                    newInput.setAttribute("placeholder", "Tag Name");
+                    $(newInput).appendTo($("#"+ receiptID.toString() + "-Tags"));
+                    newInput.onkeyup = function(e) {
+                        if(e.keyCode == 13) {
+                            var newTagName = newInput.value;
+                            newInput.remove();
+                            putTag(receiptID, newTagName);
+                        }
+                    }
+                } else {
+                    document.getElementById(receiptID.toString() + "_tag_input").remove();
+                }
+            };
+        }
+
+        function putTag(receiptID, tag) {
+            $.ajax({
+                url: "/tags/" + tag,
+                type: "PUT",
+                data: JSON.stringify(receiptID),
+                contentType: "application/json",
+                dataType: "json",
+                success: function () {
+                    getReceipts();
+                },
+                error: function (){
+                    alert("The tag you attempted to remove could not be removed. Please try again. ");
+                }
+            });
+
+            return false;
+        }
+
         function getReceipts() {
             const api = ""; // <- do not need a root api URL if this page is served directly by the API
             var table = "<tr><th>Time</th><th>Merchant</th><th>$</th><th>Tags</th></tr>";
@@ -48,13 +115,18 @@
             $.getJSON(api+"/receipts", function(receipts){
                 for(var i=0; i < receipts.length; i++) {
                     var receipt = receipts[i];
+                    var tags = receipt.tags;
+
                     $(`<tr class="receipt">`
                         + `<td class="time">${receipt.created}</td>`
                         + `<td class="merchant">${receipt.merchant}</td>`
                         + `<td class="amount">${receipt.amount}</td>`
-                        + `<td class="tags">${receipt.tags}</td>`
+                        + `<td class="tags" id=${receipt.id.toString() + "-Tags"}>`
+                        + `<div id=${receipt.id.toString() + "-TagsList"}></div>`
+                        + `</td>`
                         + `</tr>`)
                         .appendTo($("#receiptList"));
+                    addTags(tags, receipt.id);
                 }
             });
         }
@@ -89,6 +161,7 @@
                 contentType: "application/json",
                 dataType: "json",
                 success: function () {
+
                     getReceipts();
                 },
                 error: function (){
