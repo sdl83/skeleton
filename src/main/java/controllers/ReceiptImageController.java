@@ -9,6 +9,9 @@ import java.util.Collections;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import org.hibernate.validator.constraints.NotEmpty;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.lang.System.out;
 
@@ -51,11 +54,32 @@ public class ReceiptImageController {
             // Your Algo Here!!
             // Sort text annotations by bounding polygon.  Top-most non-decimal text is the merchant
             // bottom-most decimal text is the total amount
+            List<EntityAnnotation> annotations = res.getTextAnnotationsList();
+            if (annotations.size() > 0) {
+                String[] lines = annotations.get(0).getDescription().split("[\t\n\r]");
 
-            for (EntityAnnotation annotation : res.getTextAnnotationsList()) {
-                out.printf("Position : %s\n", annotation.getBoundingPoly());
-                out.printf("Text: %s\n", annotation.getDescription());
+                merchantName = lines[0];
+
+                int listLength = lines.length;
+                for (int i = listLength - 1; i >= 0; i--) {
+
+                    Pattern p = Pattern.compile("(\\d*)(\\.)(\\d)(\\d)");   // the pattern to search for
+                    Matcher m = p.matcher(lines[i]);
+
+                    if (m.find()) {
+                        amount = new BigDecimal(m.group(0));
+                    }
+
+                    if (amount != null) {
+                        break;
+                    }
+                }
             }
+
+//            for (EntityAnnotation annotation : res.getTextAnnotationsList()) {
+//                out.printf("Position : %s\n", annotation.getBoundingPoly());
+//                out.printf("Text: %s\n", annotation.getDescription());
+//            }
 
             //TextAnnotation fullTextAnnotation = res.getFullTextAnnotation();
             return new ReceiptSuggestionResponse(merchantName, amount);
